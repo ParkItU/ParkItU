@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, ScrollView, TouchableOpacity, Platform, Image, Alert } from "react-native";
 import { theme, withGalio, GalioProvider, Text, Block, NavBar, Button, Icon, } from 'galio-framework';
-import GarageService from '../services/garages'; // Importe o serviço
+import GarageService from '../services/garages';
+import { TouchableHighlight } from 'react-native';
 
 class Garage extends React.Component {
   constructor(props) {
@@ -62,21 +63,25 @@ class Garage extends React.Component {
     return garagesList.map((garage, index) => (
       <Block key={index} style={styles.container}>
         <Block style={styles.card}>
-          <Block style={styles.imageContainer}>
+          <TouchableHighlight
+            underlayColor={theme.COLORS.MUTED} // Cor de fundo quando pressionado
+            onPress={() => navigation.navigate("Carros")}
+            style={styles.imageContainer}
+          >
             <Image style={styles.image} source={{ uri: garage.image.url }} />
-            <TouchableOpacity
-              onPress={() => this.confirmAndDeleteGarage(garage)}
-              style={styles.deleteButton}
-            >
-              <Icon
-                name="trash"
-                family="feather"
-                size={theme.SIZES.BASE}
-                color={theme.COLORS.ERROR}
-                style={styles.deleteIcon}
-              />
-            </TouchableOpacity>
-          </Block>
+          </TouchableHighlight>
+          <TouchableOpacity
+            onPress={() => this.confirmAndDeleteGarage(garage)}
+            style={styles.deleteButton}
+          >
+            <Icon
+              name="trash"
+              family="feather"
+              size={theme.SIZES.BASE}
+              color={theme.COLORS.ERROR}
+              style={styles.deleteIcon}
+            />
+          </TouchableOpacity>
           <Block style={styles.content}>
             <Block style={styles.titleContainer}>
               <Text h4 style={styles.text}>{garage.name}</Text>
