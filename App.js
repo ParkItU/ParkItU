@@ -30,7 +30,7 @@ const ListGarages = ({ navigation }) => {
   const [garageslist, setGaragesList] = useState(garages);
 
   return (
-    <ScrollView style={styles.scroll}>
+    <ScrollView>
       {garageslist.map((garage, index) => (
         <Garage key={index} garage={garage} navigation={navigation} />
       ))}
@@ -42,7 +42,7 @@ const ListCars = ({ navigation }) => {
   const [carslist, setCarsList] = useState(cars);
 
   return (
-    <ScrollView style={styles.scroll}>
+    <ScrollView>
       {carslist.map((car, index) => (
         <Car key={index} car={car} navigation={navigation} />
       ))}
@@ -55,7 +55,8 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Garagem" component={ListGarages} />
         <Stack.Screen name="Carros" component={ListCars} />
         <Stack.Screen name="Novo Carro" component={NewCar} />
@@ -64,8 +65,3 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  scroll: {
-    padding: 20,
-  },
-});

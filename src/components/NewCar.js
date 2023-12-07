@@ -9,22 +9,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import axios from "axios";
-// import { Camera, CameraType } from 'expo-camera';
 
 export default function NewCar() {
   async function postNewCar() {
     await axios
-      .post("https://backendparkitu-dev.fl0.io/api/cars/", newCar)
+      .post("https://parkitu.1.us-1.fl0.io/api/", newCar)
       .then((response) => console.log(response));
   }
 
   const [newCar, setNewCar] = useState({});
-  // const [type, setType] = useState(CameraType.back);
-  // const [permission, requestPermission] = Camera.useCameraPermissions();
-
-  // function toggleCameraType() {
-  //     setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-  // }
 
   return (
     <View style={styles.container}>
@@ -50,13 +43,6 @@ export default function NewCar() {
           label={"placa"}
           placeholder={"Digite a placa"}
         ></TextInput>
-        {/* <Camera style={styles.camera} type={type}>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button} onPress={toggleCameraType}>
-                            <Text style={styles.text}>Flip Camera</Text>
-                        </TouchableOpacity>
-                    </View>
-                </Camera> */}
         <View>
           <Button title="Enviar" onPress={() => postNewCar()} />
           <StatusBar style="auto" />

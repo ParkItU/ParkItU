@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, StatusBar } from "react-native";
+import { View, Image, StyleSheet, StatusBar } from "react-native";
+import { Text } from 'galio-framework'
 import { Button } from "react-native";
 
-import carService from "./services/cars.js";
+import carService from "../services/cars.js";
 import { useEffect, useState } from "react";
 
 export default function Car({ car, navigation }) {
@@ -27,7 +28,7 @@ export default function Car({ car, navigation }) {
         <View style={styles.card}>
           {cars.map((car, index) => (
             <View style={styles.content} key={index}>
-              <Text style={styles.text}>{car.carName}</Text>
+              <Text p muted style={styles.text}>{car.carName}</Text>
               <Text style={styles.text2}>{car.carOwner}</Text>
               <Text style={styles.text2}>{car.licensePlate}</Text>
               <Text style={styles.text2}>{car.dateTime}</Text>
