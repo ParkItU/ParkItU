@@ -1,22 +1,6 @@
 import React, { Component } from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Platform,
-  Image,
-  Alert,
-} from "react-native";
-import {
-  theme,
-  withGalio,
-  GalioProvider,
-  Text,
-  Block,
-  NavBar,
-  Button,
-  Icon,
-} from "galio-framework";
+import { StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert } from "react-native";
+import { theme, Text, Block, NavBar, Button, Icon } from "galio-framework";
 import GarageService from "../services/garages";
 
 class Garage extends Component {
@@ -24,19 +8,27 @@ class Garage extends Component {
     garagesList: [],
     error: null,
     highlightedGarageId: null,
+    loading: false,
   };
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.fetchGarages();
+  }
+
+  fetchGarages = async () => {
     try {
+      this.setState({ loading: true });
       const garagesData = await GarageService.getAllGarages();
       this.setState({ garagesList: garagesData, error: null });
     } catch (error) {
       console.error("Error fetching garages:", error);
       this.setState({ error: "Erro ao carregar garagens." });
+    } finally {
+      this.setState({ loading: false });
     }
-  }
+  };
 
-  confirmDeleteGarage = async (garage) => {
+  confirmDeleteGarage = (garage) => {
     Alert.alert(
       "Confirmar Exclusão",
       `Deseja realmente excluir a garagem "${garage.name}"?`,
@@ -81,12 +73,9 @@ class Garage extends Component {
               onPress={() => this.confirmDeleteGarage(garage)}
               style={[
                 styles.deleteButton,
-                highlightedGarageId === garage.id &&
-                styles.highlightedDeleteButton,
+                highlightedGarageId === garage.id && styles.highlightedDeleteButton,
               ]}
-              onTouchStart={() =>
-                this.setState({ highlightedGarageId: garage.id })
-              }
+              onTouchStart={() => this.setState({ highlightedGarageId: garage.id })}
               onTouchEnd={() => this.setState({ highlightedGarageId: null })}
             >
               <Icon
@@ -105,11 +94,8 @@ class Garage extends Component {
               </Text>
             </Block>
             <Text style={styles.text2}>{garage.address}</Text>
-            <Button
-              style={styles.button}
-              onPress={() => navigation.navigate("Carros")}
-            >
-              Ver Carros
+            <Button style={styles.button} onPress={() => navigation.navigate("Carros")}>
+              Ver Veículos
             </Button>
           </Block>
         </Block>
@@ -118,26 +104,17 @@ class Garage extends Component {
   };
 
   render() {
-    const { error } = this.state;
+    const { error, loading } = this.state;
     const { navigation } = this.props;
 
     return (
       <Block safe flex>
         <NavBar
-          title="Minhas Garagens"
+          title="Garagens"
           titleStyle={styles.navTitle}
           leftIconColor={theme.COLORS.MUTED}
           rightIconColor={theme.COLORS.ICON}
-          left={
-            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-              <Icon
-                name="menu"
-                family="feather"
-                size={theme.SIZES.BASE}
-                color={theme.COLORS.ICON}
-              />
-            </TouchableOpacity>
-          }
+          left={<Icon name="menu" family="feather" size={theme.SIZES.BASE} color={theme.COLORS.ICON} />}
           right={
             <Button
               onlyIcon
@@ -148,10 +125,11 @@ class Garage extends Component {
               onPress={() => navigation.navigate("Novo Carro")}
             />
           }
-          style={Platform.OS === "android" ? styles.navBarAndroid : null}
         />
         <ScrollView>
-          {error ? (
+          {loading ? (
+            <ActivityIndicator size="large" color={theme.COLORS.INFO} style={styles.loadingIndicator} />
+          ) : error ? (
             <Text style={styles.errorText}>{error}</Text>
           ) : (
             this.renderGarages()
@@ -163,12 +141,6 @@ class Garage extends Component {
 }
 
 const styles = StyleSheet.create({
-  navTitle: {
-    alignSelf: "flex-start",
-    marginLeft: 10,
-    fontWeight: "bold",
-    color: theme.COLORS.ICON,
-  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -237,8 +209,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: theme.SIZES.BASE,
   },
-  navBarAndroid: {
+  loadingIndicator: {
     marginTop: theme.SIZES.BASE,
+  },
+  navTitle: {
+    alignSelf: "flex-start",
+    marginLeft: 10,
+    fontWeight: "bold",
+    color: theme.COLORS.ICON,
   },
 });
 
