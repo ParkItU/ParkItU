@@ -172,12 +172,13 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     borderRadius: 5,
-    backgroundColor: theme.COLORS.ICON,
+    backgroundColor: theme.COLORS.INFO,
   },
   deleteButton: {
     position: "absolute",
     top: 10,
     right: 10,
+    backgroundColor: "red"
   },
   highlightedDeleteButton: {
     backgroundColor: "rgba(255, 0, 0, 0.2)",

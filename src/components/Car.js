@@ -80,6 +80,7 @@ export default function Cars({ navigation }) {
             family="feather"
             iconSize={theme.SIZES.BASE}
             color={theme.COLORS.ERROR}
+            backgroundColor={theme.COLORS.ERROR}
           />
         </Block>
       </Card>
@@ -151,6 +152,8 @@ const styles = StyleSheet.create({
   },
   button: {
     alignSelf: "flex-end",
+    color: theme.COLORS.ERROR,
+    backgroundColor: theme.COLORS.ERROR,
   },
   cardDescription: {
     padding: theme.SIZES.BASE / 2,
