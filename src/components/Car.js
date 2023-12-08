@@ -86,58 +86,14 @@ export default function Cars({ navigation }) {
     ));
   };
 
-  const handleAddCar = () => {
-    // Adicione lógica para adicionar um novo carro
-    // Aqui, você pode abrir um modal para inserção de dados ou navegar para a tela de adição
-    showAlert("info", "Funcionalidade de adicionar carro não implementada.");
-  };
-
-  const handleSortByOwner = () => {
-    // Adicione lógica para ordenar os carros por proprietário
-    // Aqui, você pode alterar a ordem dos carros no estado
-    showAlert("info", "Funcionalidade de ordenar por proprietário não implementada.");
-  };
-
-  const handleFilterByBrand = () => {
-    // Adicione lógica para filtrar os carros por marca
-    // Aqui, você pode modificar os carros exibidos no estado
-    showAlert("info", "Funcionalidade de filtrar por marca não implementada.");
-  };
-
-  const handleSearch = () => {
-    // Adicione lógica para pesquisar carros
-    // Aqui, você pode abrir um modal de pesquisa ou alterar os carros exibidos no estado
-    showAlert("info", "Funcionalidade de pesquisa não implementada.");
-  };
-
-  const handleShowMap = () => {
-    // Adicione lógica para mostrar um mapa com a localização dos carros
-    // Aqui, você pode abrir uma tela de mapa ou utilizar um modal
-    showAlert("info", "Funcionalidade de mostrar mapa não implementada.");
-  };
-
-  const handleExportCSV = () => {
-    // Adicione lógica para exportar os dados dos carros para um arquivo CSV
-    // Aqui, você pode utilizar uma biblioteca para gerar o CSV
-    showAlert("info", "Funcionalidade de exportar para CSV não implementada.");
-  };
-
   return (
     <Block safe flex>
       <NavBar
-        title="Veículos Disponíveis"
+        title="Veículos"
         titleStyle={styles.navTitle}
         leftIconColor={theme.COLORS.MUTED}
         rightIconColor={theme.COLORS.ICON}
-        left={
-          <Icon
-            name="chevron-left"
-            family="feather"
-            size={theme.SIZES.BASE}
-            color={theme.COLORS.ICON}
-            onPress={() => navigation.goBack()}
-          />
-        }
+        left={<Icon name="chevron-left" family="feather" size={theme.SIZES.BASE} color={theme.COLORS.ICON} onPress={() => navigation.goBack()} />}
         right={
           <Button
             onlyIcon
@@ -145,10 +101,9 @@ export default function Cars({ navigation }) {
             iconFamily="feather"
             iconSize={theme.SIZES.BASE}
             color={theme.COLORS.ICON}
-            onPress={handleAddCar}
+            onPress={() => navigation.navigate("Novo Carro")}
           />
         }
-        style={styles.navBar}
       />
       <ScrollView style={styles.scrollView}>
         {loading ? (
