@@ -55,6 +55,21 @@ class GarageService {
             throw error;
         }
     }
+
+    async createGarage(garageData) {
+        try {
+            console.log("Garage Data:", garageData);
+
+            const response = await api.post("/garages/", garageData);
+
+            console.log("Create Garage Response:", response.data);
+
+            return response.data;
+        } catch (error) {
+            console.error("Error creating garage:", error);
+            throw error;
+        }
+    }
 }
 
 export default new GarageService();

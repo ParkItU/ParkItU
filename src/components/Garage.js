@@ -60,6 +60,7 @@ class Garage extends Component {
     }
   };
 
+
   renderGarages = () => {
     const { garagesList, highlightedGarageId } = this.state;
     const { navigation } = this.props;
@@ -68,7 +69,11 @@ class Garage extends Component {
       <Block key={index} style={styles.container}>
         <Block style={styles.card}>
           <Block style={styles.imageContainer}>
-            <Image style={styles.image} source={{ uri: garage.image.url }} />
+            {garage.image && garage.image.url ? (
+              <Image style={styles.image} source={{ uri: garage.image.url }} />
+            ) : (
+              <Text style={styles.errorText}>Imagem não disponível</Text>
+            )}
             <TouchableOpacity
               onPress={() => this.confirmDeleteGarage(garage)}
               style={[
@@ -110,18 +115,22 @@ class Garage extends Component {
     return (
       <Block safe flex>
         <NavBar
+          style={styles.navbar}
           title="Garagens"
           titleStyle={styles.navTitle}
-          leftIconColor={theme.COLORS.MUTED}
-          rightIconColor={theme.COLORS.ICON}
-          left={<Icon name="menu" family="feather" size={theme.SIZES.BASE} color={theme.COLORS.ICON} />}
+          leftIconColor={theme.COLORS.WHITE}
+          rightIconColor={theme.COLORS.INFO}
+          backgroundColor={theme.COLORS.INFO}
+          iconColor={theme.COLORS.WHITE}
+          left={<Icon name="menu" family="feather" size={24} color={theme.COLORS.WHITE} />}
           right={
             <Button
               onlyIcon
               icon="plus"
               iconFamily="feather"
               iconSize={theme.SIZES.BASE}
-              color={theme.COLORS.ICON}
+              color={theme.COLORS.WHITE}
+              iconColor={theme.COLORS.INFO}
               onPress={() => navigation.navigate("Novo Carro")}
             />
           }
@@ -164,7 +173,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: theme.SIZES.BASE * 20,
-    height: theme.SIZES.BASE * 20,
+    height: theme.SIZES.BASE * 12,
     borderRadius: theme.SIZES.BASE / 2,
     marginBottom: theme.SIZES.BASE,
   },
@@ -178,17 +187,16 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: "red"
   },
   highlightedDeleteButton: {
     backgroundColor: "rgba(255, 0, 0, 0.2)",
   },
   deleteIcon: {
-    color: theme.COLORS.ERROR,
+    color: "red",
   },
   content: {
     flex: 1,
-    padding: theme.SIZES.BASE * 2,
+    padding: theme.SIZES.BASE,
     flexDirection: "column",
     alignItems: "center",
   },
@@ -196,14 +204,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: theme.SIZES.BASE,
   },
   text: {
-    color: theme.COLORS.ICON,
+    color: theme.COLORS.BLACK,
     fontWeight: "bold",
   },
   text2: {
-    color: theme.COLORS.ICON,
+    color: theme.COLORS.BLACK,
+    marginBottom: theme.SIZES.BASE,
   },
   errorText: {
     color: theme.COLORS.ERROR,
@@ -217,7 +225,11 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 10,
     fontWeight: "bold",
-    color: theme.COLORS.ICON,
+    fontSize: 20,
+    color: theme.COLORS.WHITE,
+  },
+  navbar: {
+    backgroundColor: theme.COLORS.INFO,
   },
 });
 

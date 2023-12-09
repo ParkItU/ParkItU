@@ -63,8 +63,7 @@ export default function Cars({ navigation }) {
         image={car.image.url}
         imageStyle={styles.carImage}
         borderless={true}
-        shadowColor={theme.COLORS.BLACK}
-        style={styles.card}
+        shadowColor={theme.COLORS.INFO}
         imageBlockStyle={{ padding: theme.SIZES.BASE / 2 }}
         imageStyle={styles.cardImageRadius}
       >
@@ -73,14 +72,13 @@ export default function Cars({ navigation }) {
             {car.licensePlate}
           </Text>
           <Icon
-            style={styles.button}
             onPress={() => deleteCar(car.id)}
             onlyIcon
             name="trash"
             family="feather"
+            style={styles.deleteIcon}
             iconSize={theme.SIZES.BASE}
             color={theme.COLORS.ERROR}
-            backgroundColor={theme.COLORS.ERROR}
           />
         </Block>
       </Card>
@@ -91,17 +89,25 @@ export default function Cars({ navigation }) {
     <Block safe flex>
       <NavBar
         title="Veículos"
+        style={styles.navbar}
         titleStyle={styles.navTitle}
-        leftIconColor={theme.COLORS.MUTED}
-        rightIconColor={theme.COLORS.ICON}
-        left={<Icon name="chevron-left" family="feather" size={theme.SIZES.BASE} color={theme.COLORS.ICON} onPress={() => navigation.goBack()} />}
+        leftIconColor={theme.COLORS.BLACK}
+        rightIconColor={theme.COLORS.INFO}
+        left={<Icon
+          name="chevron-left"
+          family="feather"
+          size={24}
+          color="white"
+          onPress={() => navigation.goBack()}
+        />}
         right={
           <Button
             onlyIcon
             icon="plus"
             iconFamily="feather"
             iconSize={theme.SIZES.BASE}
-            color={theme.COLORS.ICON}
+            color={theme.COLORS.WHITE}
+            iconColor={theme.COLORS.INFO}
             onPress={() => navigation.navigate("Novo Carro")}
           />
         }
@@ -130,7 +136,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 10,
     fontWeight: "bold",
-    color: theme.COLORS.ICON,
+    fontSize: 20,
+    color: theme.COLORS.WHITE,
   },
   card: {
     backgroundColor: theme.COLORS.WHITE,
@@ -150,11 +157,6 @@ const styles = StyleSheet.create({
     width: "auto",
     height: 200,
   },
-  button: {
-    alignSelf: "flex-end",
-    color: theme.COLORS.ERROR,
-    backgroundColor: theme.COLORS.ERROR,
-  },
   cardDescription: {
     padding: theme.SIZES.BASE / 2,
     margin: theme.SIZES.BASE / 2,
@@ -163,6 +165,8 @@ const styles = StyleSheet.create({
   },
   text2: {
     color: theme.COLORS.ICON,
+    textAlign: "center",
+    marginTop: theme.SIZES.BASE / 2,
   },
   errorText: {
     color: theme.COLORS.ERROR,
@@ -187,5 +191,12 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginVertical: theme.SIZES.BASE / 2,
+  },
+  navbar: {
+    backgroundColor: theme.COLORS.INFO,
+  },
+  deleteIcon: {
+    color: "red",
+    alignSelf: "flex-end",
   },
 });

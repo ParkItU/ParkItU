@@ -10,29 +10,8 @@ import {
   Keyboard,
 } from "react-native";
 import { Text, Button, Block, NavBar, Icon, Input, theme } from "galio-framework";
-import carService from "../services/cars.js";
+import CarService from "../services/cars.js";
 import GarageService from "../services/garages.js";
-
-const PreviewScreen = ({ onSelectEntity, entityType, icon, title, description, buttonText }) => (
-  <Block style={styles.previewContainer}>
-    <Icon
-      family="MaterialIcons"
-      name={icon}
-      size={100}
-      color={theme.COLORS.ICON}
-      style={styles.previewIcon}
-    />
-    <Text h4 style={styles.previewTitle}>
-      {title}
-    </Text>
-    <Text style={styles.previewDescription}>
-      {description}
-    </Text>
-    <Button onPress={() => onSelectEntity(entityType)} style={styles.previewButton}>
-      {buttonText}
-    </Button>
-  </Block>
-);
 
 const NewCar = ({ navigation }) => {
   const [garages, setGarages] = useState([]);
@@ -41,20 +20,23 @@ const NewCar = ({ navigation }) => {
   const [showCarForm, setShowCarForm] = useState(false);
   const [showGarageForm, setShowGarageForm] = useState(false);
 
-  const [carForm, setCarForm] = useState({
+  const initialCarFormState = {
     name: "",
     owner: "",
     licensePlate: "",
     date: "",
     image: "",
     garageName: "",
-  });
+  };
 
-  const [garageForm, setGarageForm] = useState({
+  const initialGarageFormState = {
     name: "",
     address: "",
     image: "",
-  });
+  };
+
+  const [carForm, setCarForm] = useState(initialCarFormState);
+  const [garageForm, setGarageForm] = useState(initialGarageFormState);
 
   useEffect(() => {
     fetchGarages();
@@ -96,7 +78,7 @@ const NewCar = ({ navigation }) => {
 
       if (!confirmed) return;
 
-      await (entityType === "Car" ? carService.deleteCar(entityId) : GarageService.deleteGarage(entityId));
+      await (entityType === "Car" ? CarService.deleteCar(entityId) : GarageService.deleteGarage(entityId));
 
       const updatedEntities = garages.filter((entity) => entity.id !== entityId);
       setGarages(updatedEntities);
@@ -117,10 +99,12 @@ const NewCar = ({ navigation }) => {
 
   const handleSaveEntity = async (entityType) => {
     const form = entityType === "Car" ? carForm : garageForm;
-    const service = entityType === "Car" ? carService : GarageService;
+    console.log("Dados do formulário:", form);
+
+    const service = entityType === "Car" ? CarService : GarageService;
 
     try {
-      await service.saveEntity(form);
+      await service.createGarage(form);
 
       if (entityType === "Car") {
         setShowCarForm(false);
@@ -138,6 +122,7 @@ const NewCar = ({ navigation }) => {
     }
   };
 
+
   const handleImageChange = (entityType, image) => {
     if (entityType === "Car") {
       setCarForm({ ...carForm, image });
@@ -151,36 +136,63 @@ const NewCar = ({ navigation }) => {
       <NavBar
         title="Cadastro"
         titleStyle={styles.navTitle}
-        leftIconColor="black"
+        leftIconColor="white"
         rightIconColor="black"
+        style={styles.navbar}
         left={
           <Icon
             name="chevron-left"
             family="feather"
             size={24}
-            color="black"
+            color="white"
             onPress={() => navigation.goBack()}
           />
         }
       />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <>
-          <PreviewScreen
-            onSelectEntity={() => handleAddEntity("Car")}
-            entityType="Car"
-            icon="directions-car"
-            title="Cadastro de Veículo"
-            description="Clique no botão abaixo para adicionar um novo carro à sua frota."
-            buttonText="Novo"
-          />
-          <PreviewScreen
-            onSelectEntity={() => handleAddEntity("Garage")}
-            entityType="Garage"
-            icon="home"
-            title="Cadastro de Garagem"
-            description="Clique no botão abaixo para adicionar uma nova garagem à sua lista."
-            buttonText="Novo"
-          />
+          <Block style={styles.previewContainer}>
+            <Block style={styles.card}>
+              <Icon
+                family="MaterialIcons"
+                name="directions-car"
+                size={80}
+                color={theme.COLORS.ICON}
+                style={styles.previewIcon}
+              />
+              <Text h5 style={styles.previewTitle}>
+                Cadastro de Veículo
+              </Text>
+              <Text style={styles.previewDescription}>
+                Clique no botão abaixo para adicionar um novo carro à sua frota.
+              </Text>
+              <Button onPress={() => handleAddEntity("Car")} style={styles.previewButton}>
+                Novo
+              </Button>
+            </Block>
+            <View style={{ marginVertical: 20 }} />
+          </Block>
+          <Block style={styles.previewContainer}>
+            <Block style={styles.card}>
+              <Icon
+                family="MaterialIcons"
+                name="home"
+                size={80}
+                color={theme.COLORS.ICON}
+                style={styles.previewIcon}
+              />
+              <Text h5 style={styles.previewTitle}>
+                Cadastro de Garagem
+              </Text>
+              <Text style={styles.previewDescription}>
+                Clique no botão abaixo para adicionar uma nova garagem à sua lista.
+              </Text>
+              <Button onPress={() => handleAddEntity("Garage")} style={styles.previewButton}>
+                Novo
+              </Button>
+            </Block>
+            <View style={{ marginVertical: 20 }} />
+          </Block>
           {showCarForm && (
             <Modal
               animationType="slide"
@@ -300,6 +312,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: "center",
+
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
@@ -308,6 +321,7 @@ const styles = StyleSheet.create({
     padding: theme.SIZES.BASE,
     width: "80%",
     alignSelf: "center",
+
   },
   modalTitle: {
     marginBottom: theme.SIZES.BASE,
@@ -316,7 +330,7 @@ const styles = StyleSheet.create({
   modalButton: {
     marginVertical: theme.SIZES.BASE / 2,
     color: "white",
-    backgroundColor: theme.COLORS.BLACK,
+    backgroundColor: theme.COLORS.INFO,
     borderRadius: theme.SIZES.BASE / 2,
   },
   sectionTitle: {
@@ -334,12 +348,13 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: theme.COLORS.WHITE,
-    marginVertical: theme.SIZES.BASE / 2,
-    marginHorizontal: theme.SIZES.BASE / 2,
-    borderRadius: theme.SIZES.BASE,
+    borderRadius: theme.SIZES.BASE / 2,
     shadowColor: theme.COLORS.BLACK,
     shadowRadius: 4,
     elevation: 2,
+    padding: theme.SIZES.BASE,
+    width: "80%",
+    alignItems: "center",
   },
   cardImageRadius: {
     borderRadius: theme.SIZES.BASE / 2,
@@ -366,35 +381,39 @@ const styles = StyleSheet.create({
     marginBottom: theme.SIZES.BASE / 2,
   },
   navTitle: {
-    color: "black",
+    alignSelf: "flex-start",
+    marginLeft: 10,
     fontWeight: "bold",
+    alignItems: "center",
     fontSize: 20,
+    color: theme.COLORS.WHITE,
   },
   previewContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: theme.SIZES.BASE * 2,
+    marginTop: theme.SIZES.BASE * 2,
   },
   previewIcon: {
     marginBottom: theme.SIZES.BASE,
   },
   previewTitle: {
-    marginBottom: theme.SIZES.BASE,
+    marginBottom: theme.SIZES.BASE / 2,
     fontWeight: "bold",
     color: theme.COLORS.BLACK,
   },
   previewDescription: {
     textAlign: "center",
-    marginBottom: theme.SIZES.BASE * 2,
+    marginBottom: theme.SIZES.BASE,
     color: theme.COLORS.BLACK,
   },
   previewButton: {
-    width: "30%",
-    marginBottom: theme.SIZES.BASE * 2,
-    backgroundColor: theme.COLORS.BLACK,
+    width: "50%",
+    backgroundColor: theme.COLORS.INFO,
     borderRadius: theme.SIZES.BASE / 2,
-
+  },
+  navbar: {
+    backgroundColor: theme.COLORS.INFO,
   },
 });
 
