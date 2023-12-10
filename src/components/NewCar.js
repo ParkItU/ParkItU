@@ -1,34 +1,27 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-  ScrollView,
-  Alert,
-  Modal,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from "react-native";
-import { Text, Button, Block, NavBar, Icon, Input, theme } from "galio-framework";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, StatusBar, ScrollView, Alert, Modal, TouchableWithoutFeedback, Keyboard, Image } from "react-native";
+import { Text, Button, Block, Icon, Input, theme, NavBar } from "galio-framework";
 import CarService from "../services/cars.js";
 import GarageService from "../services/garages.js";
-// import DocumentPicker from 'react-native-document-picker';
 import ImagePicker from 'react-native-image-picker';
 
 const NewCar = ({ navigation }) => {
   const [garages, setGarages] = useState([]);
+  const [cars, setCars] = useState([]);
   const [error, setError] = useState(null);
   const [alert, setAlert] = useState(null);
   const [showCarForm, setShowCarForm] = useState(false);
   const [showGarageForm, setShowGarageForm] = useState(false);
+  const [selectedCarImage, setSelectedCarImage] = useState(null);
+  const [selectedGarageImage, setSelectedGarageImage] = useState(null);
 
   const initialCarFormState = {
     name: "",
     owner: "",
     licensePlate: "",
-    date: "",
-    image: "",
-    garageName: "",
+    date: "data_valor",
+    garage: "garagem_valor",
+    ownerPhone: "telefone_proprietario_valor",
   };
 
   const initialGarageFormState = {
@@ -37,89 +30,56 @@ const NewCar = ({ navigation }) => {
     image: "",
   };
 
-  const pickDocument = async () => {
-    try {
-      const result = await DocumentPicker.pick({
-        type: [DocumentPicker.types.images],
-      });
-
-      console.log(
-        result.uri,
-        result.type, // mime type
-        result.name,
-        result.size
-      );
-
-      setGarageForm({ ...garageForm, image: result.uri });
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // Usuário cancelou a escolha do documento
-      } else {
-        throw err;
-      }
-    }
-  };
-
-  const handleInputChange = (entityType, field, value) => {
-    if (entityType === "Car") {
-      setCarForm((prevForm) => ({ ...prevForm, [field]: value }));
-    } else {
-      setGarageForm((prevForm) => ({ ...prevForm, [field]: value }));
-    }
-  };
-
   const [carForm, setCarForm] = useState(initialCarFormState);
   const [garageForm, setGarageForm] = useState(initialGarageFormState);
 
-  useEffect(() => {
-    fetchGarages();
-  }, []);
+  const pickCarImage = () => {
+    const options = {
+      title: 'Escolher imagem do carro',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
 
-  const fetchGarages = async () => {
-    try {
-      const garagesData = await GarageService.getAllGarages();
-      setGarages(garagesData);
-    } catch (error) {
-      handleServiceError("Erro ao carregar garagens.", error);
-    }
+    ImagePicker.showImagePicker(options, (response) => {
+      if (response.didCancel) {
+        console.log('Usuário cancelou a escolha da imagem');
+      } else if (response.error) {
+        console.log('Erro ao escolher imagem:', response.error);
+      } else {
+        setSelectedCarImage({ uri: response.uri });
+        setCarForm({ ...carForm, image: response.uri });
+      }
+    });
   };
 
-  const handleServiceError = (message, error) => {
-    console.error(message, error);
-    setError({ message, error });
-    showAlert("error", message);
+  const pickGarageImage = () => {
+    const options = {
+      title: 'Escolher imagem da garagem',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+
+    ImagePicker.showImagePicker(options, (response) => {
+      if (response.didCancel) {
+        console.log('Usuário cancelou a escolha da imagem');
+      } else if (response.error) {
+        console.log('Erro ao escolher imagem:', response.error);
+      } else {
+        setSelectedGarageImage({ uri: response.uri });
+        setGarageForm({ ...garageForm, image: response.uri });
+      }
+    });
   };
 
-  const showAlert = (type, message) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  };
-
-  const deleteEntity = async (entityType, entityId) => {
-    try {
-      const confirmed = await new Promise((resolve) =>
-        Alert.alert(
-          `Confirmar Exclusão de ${entityType}`,
-          `Tem certeza que deseja excluir este ${entityType.toLowerCase()}?`,
-          [
-            { text: "Cancelar", style: "cancel", onPress: () => resolve(false) },
-            { text: "Excluir", onPress: () => resolve(true) },
-          ],
-          { cancelable: true }
-        )
-      );
-
-      if (!confirmed) return;
-
-      await (entityType === "Car" ? CarService.deleteCar(entityId) : GarageService.deleteGarage(entityId));
-
-      const updatedEntities = garages.filter((entity) => entity.id !== entityId);
-      setGarages(updatedEntities);
-      showAlert("success", `${entityType} excluído com sucesso.`);
-    } catch (error) {
-      const errorMessage = `Erro ao deletar ${entityType.toLowerCase()}.`;
-      handleServiceError(errorMessage, error);
-    }
+  const handleInputChange = (field, value) => {
+    setGarageForm((prevForm) => ({
+      ...prevForm,
+      [field]: value,
+    }));
   };
 
   const handleAddEntity = (entityType) => {
@@ -130,17 +90,25 @@ const NewCar = ({ navigation }) => {
     }
   };
 
+  const handleServiceError = (message, error) => {
+    console.error(message, error);
+    setError({ message, error });
+    showAlert("error", message);
+  };
+
   const handleSaveEntity = async (entityType) => {
     const form = entityType === "Car" ? carForm : garageForm;
     console.log("Dados do formulário:", form);
+
     const service = entityType === "Car" ? CarService : GarageService;
 
     try {
-      await service.createGarage(form);
+      await service.createCar(form);
 
       if (entityType === "Car") {
         setShowCarForm(false);
         setCarForm(initialCarFormState);
+        fetchCars();
       } else {
         setShowGarageForm(false);
         setGarageForm(initialGarageFormState);
@@ -150,9 +118,17 @@ const NewCar = ({ navigation }) => {
       showAlert("success", `${entityType} adicionado com sucesso.`);
     } catch (error) {
       const errorMessage = `Erro ao salvar ${entityType.toLowerCase()}.`;
-      handleServiceError(errorMessage, error);
+
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        showAlert("error", errorMessage);
+      } else {
+        console.error("Error creating car:", error);
+        handleServiceError(errorMessage, error);
+      }
     }
   };
+
 
   return (
     <Block safe flex>
@@ -247,24 +223,6 @@ const NewCar = ({ navigation }) => {
                       value={carForm.licensePlate}
                       onChangeText={(text) => setCarForm({ ...carForm, licensePlate: text })}
                     />
-                    <Input
-                      label="Data"
-                      placeholder="Data do carro"
-                      value={carForm.date}
-                      onChangeText={(text) => setCarForm({ ...carForm, date: text })}
-                    />
-                    <Input
-                      label="Imagem"
-                      placeholder="URL da imagem do carro"
-                      value={carForm.image}
-                      onChangeText={(text) => setCarForm({ ...carForm, image: text })}
-                    />
-                    <Input
-                      label="Garagem"
-                      placeholder="Nome da garagem do carro"
-                      value={carForm.garageName}
-                      onChangeText={(text) => setCarForm({ ...carForm, garageName: text })}
-                    />
                     <Button onPress={() => handleSaveEntity("Car")} style={styles.modalButton}>
                       Adicionar Veículo
                     </Button>
@@ -293,21 +251,25 @@ const NewCar = ({ navigation }) => {
                       label="Nome"
                       placeholder="Nome da garagem"
                       value={garageForm.name}
-                      onChangeText={(text) => handleInputChange("Garage", "name", text)}
+                      onChangeText={(text) => handleInputChange("name", text)}
                     />
                     <Input
                       label="Endereço"
                       placeholder="Endereço da garagem"
                       value={garageForm.address}
-                      onChangeText={(text) => handleInputChange("Garage", "address", text)}
+                      onChangeText={(text) => handleInputChange("address", text)}
                     />
                     <Input
                       label="Imagem"
                       placeholder="Clique para escolher uma imagem"
                       value={garageForm.image}
-                      onFocus={pickDocument}
+                      onFocus={pickGarageImage}
                       editable={false}
                     />
+                    <View style={styles.container}>
+                      <Button title="Escolher Imagem" onPress={pickGarageImage} />
+                      {selectedGarageImage && <Image source={selectedGarageImage} style={styles.image} />}
+                    </View>
                     <Button onPress={() => handleSaveEntity("Garage")} style={styles.modalButton}>
                       Adicionar Garagem
                     </Button>
@@ -330,7 +292,6 @@ const NewCar = ({ navigation }) => {
     </Block>
   );
 };
-
 
 const styles = StyleSheet.create({
   modalContainer: {

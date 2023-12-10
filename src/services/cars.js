@@ -5,9 +5,16 @@ class CarService {
     const response = await api.get("/cars/");
     return response.data;
   }
-  async deleteCar(car) {
-    const response = await api.delete("/cars/${car.id}/");
-    return response.data;
+
+  async createCar(carData) {
+    try {
+      const response = await api.post("/cars/", carData);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating car:", error);
+      console.error("Response data:", error.response.data);
+      throw error;
+    }
   }
 }
 
