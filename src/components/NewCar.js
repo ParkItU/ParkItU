@@ -12,6 +12,8 @@ import {
 import { Text, Button, Block, NavBar, Icon, Input, theme } from "galio-framework";
 import CarService from "../services/cars.js";
 import GarageService from "../services/garages.js";
+// import DocumentPicker from 'react-native-document-picker';
+import ImagePicker from 'react-native-image-picker';
 
 const NewCar = ({ navigation }) => {
   const [garages, setGarages] = useState([]);
@@ -33,6 +35,37 @@ const NewCar = ({ navigation }) => {
     name: "",
     address: "",
     image: "",
+  };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
+      });
+
+      console.log(
+        result.uri,
+        result.type, // mime type
+        result.name,
+        result.size
+      );
+
+      setGarageForm({ ...garageForm, image: result.uri });
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // Usuário cancelou a escolha do documento
+      } else {
+        throw err;
+      }
+    }
+  };
+
+  const handleInputChange = (entityType, field, value) => {
+    if (entityType === "Car") {
+      setCarForm((prevForm) => ({ ...prevForm, [field]: value }));
+    } else {
+      setGarageForm((prevForm) => ({ ...prevForm, [field]: value }));
+    }
   };
 
   const [carForm, setCarForm] = useState(initialCarFormState);
@@ -100,7 +133,6 @@ const NewCar = ({ navigation }) => {
   const handleSaveEntity = async (entityType) => {
     const form = entityType === "Car" ? carForm : garageForm;
     console.log("Dados do formulário:", form);
-
     const service = entityType === "Car" ? CarService : GarageService;
 
     try {
@@ -119,15 +151,6 @@ const NewCar = ({ navigation }) => {
     } catch (error) {
       const errorMessage = `Erro ao salvar ${entityType.toLowerCase()}.`;
       handleServiceError(errorMessage, error);
-    }
-  };
-
-
-  const handleImageChange = (entityType, image) => {
-    if (entityType === "Car") {
-      setCarForm({ ...carForm, image });
-    } else {
-      setGarageForm({ ...garageForm, image });
     }
   };
 
@@ -270,19 +293,20 @@ const NewCar = ({ navigation }) => {
                       label="Nome"
                       placeholder="Nome da garagem"
                       value={garageForm.name}
-                      onChangeText={(text) => setGarageForm({ ...garageForm, name: text })}
+                      onChangeText={(text) => handleInputChange("Garage", "name", text)}
                     />
                     <Input
                       label="Endereço"
                       placeholder="Endereço da garagem"
                       value={garageForm.address}
-                      onChangeText={(text) => setGarageForm({ ...garageForm, address: text })}
+                      onChangeText={(text) => handleInputChange("Garage", "address", text)}
                     />
                     <Input
                       label="Imagem"
-                      placeholder="URL da imagem da garagem"
+                      placeholder="Clique para escolher uma imagem"
                       value={garageForm.image}
-                      onChangeText={(text) => setGarageForm({ ...garageForm, image: text })}
+                      onFocus={pickDocument}
+                      editable={false}
                     />
                     <Button onPress={() => handleSaveEntity("Garage")} style={styles.modalButton}>
                       Adicionar Garagem
